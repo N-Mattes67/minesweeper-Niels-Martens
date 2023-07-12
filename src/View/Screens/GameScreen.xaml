@@ -1,0 +1,147 @@
+﻿<UserControl x:Class="View.Screens.GameScreen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:View.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="500">
+    <UserControl.Resources>
+        <converters:IsLastPressedOnLossConverter x:Key="isLastPressedOnLossConverter" Yes="Yes" No="No"/>
+        <converters:ColorConverter x:Key="colorConverter" Blue="LightSkyBlue" Gray="LightGray" Pink="Pink" Green="PaleGreen" Yellow="Khaki"/>
+        <converters:SquareStatusConverter x:Key="squareStatusToColor" Uncovered="" Covered="Gray" Flagged="" Mine=""/>
+        <converters:SquareStatusConverter x:Key="squareStatusToMineVisibility" Uncovered="Hidden" Covered="Hidden" Flagged="Hidden" Mine="Visible"/>
+        <converters:SquareStatusConverter x:Key="squareStatusToFlagVisibility" Uncovered="Hidden" Covered="Hidden" Flagged="Visible" Mine="Hidden"/>
+        <converters:SquareStatusConverter x:Key="squareStatusToNumberVisibility" Uncovered="Visible" Covered="Hidden" Flagged="Hidden" Mine="Hidden"/>
+        <converters:SquareMineCountConverter x:Key="squareMineCountToNumberVisibility" Zero="Hidden" One="Visible" Two="Visible" Three="Visible" Four="Visible" Five="Visible" Six="Visible" Seven="Visible" Eight="Visible"/>
+        <converters:SquareMineCountConverter x:Key="squareMineCountToNumberColor" Zero="Transparent" One="Visible" Two="Visible" Three="Visible" Four="Visible" Five="Visible" Six="Visible" Seven="Visible" Eight="Visible"/>
+        <converters:GameStatusConverter x:Key="gameStatusConverterForWin" InProgress="Hidden" Won="Visible" Lost="Hidden"/>
+        <converters:GameStatusConverter x:Key="gameStatusConverterForLoss" InProgress="Hidden" Won="Hidden" Lost="Visible"/>
+        <converters:GameStatusConverter x:Key="gameStatusConverterForButton" InProgress="True" Won="False" Lost="False"/>
+        <converters:IsMineAfterGameConverter x:Key="IsMineAfterGameWon" Hide="Hidden" Won="Visible" Lost="Hidden"/>
+        <converters:IsMineAfterGameConverter x:Key="IsMineAfterGameLost" Hide="Hidden" Won="Hidden" Lost="Visible"/>
+    </UserControl.Resources>
+    <Grid>
+        <TextBlock Text="{Binding NumberOfMines.Value}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,20,0,0" FontSize="36" />
+        <TextBlock Text="{Binding Time.Value}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,0" FontSize="36" Width="86" />
+        <TextBlock Text="You won!!" Visibility="{Binding Game.Status.Value, Converter={StaticResource gameStatusConverterForWin}}" FontSize="36" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        <TextBlock Text="You lost.." Visibility="{Binding Game.Status.Value, Converter={StaticResource gameStatusConverterForLoss}}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,20,0,0"/>
+        <Viewbox Stretch="Uniform">
+            <Grid>
+                <ItemsControl ItemsSource="{Binding Game.Board.Rows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ItemsControl ItemsSource="{Binding Squares}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Width="32" Height="32" IsEnabled="{Binding GameStatus.Value, Converter={StaticResource gameStatusConverterForButton}}">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="{x:Type Button}">
+                                                    <Border Name="border" BorderThickness="0.5" BorderBrush="Black" Background="{Binding Color, Converter={StaticResource colorConverter}}">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <DataTrigger Binding="{Binding Square.Value.Status, Converter={StaticResource squareStatusToColor}}" Value="Gray">
+                                                            <Setter TargetName="border" Property="Background" Value="DarkGray"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Value="Yes">
+                                                            <DataTrigger.Binding>
+                                                                <MultiBinding Converter="{StaticResource isLastPressedOnLossConverter}">
+                                                                    <Binding Path="IsLastPressedOnLoss.Value"/>
+                                                                    <Binding Path="Position"/>
+                                                                </MultiBinding>
+                                                            </DataTrigger.Binding>
+                                                            <Setter TargetName="border" Property="Background" Value="Red"/>
+                                                        </DataTrigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="BorderBrush" Value="{Binding Color, Converter={StaticResource colorConverter}}"/>
+                                                            <Setter TargetName="border" Property="BorderThickness" Value="1.5"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                            <Button.InputBindings>
+                                                <MouseBinding Gesture="LeftClick" Command="{Binding Uncover}"/>
+                                                <MouseBinding Gesture="RightClick" Command="{Binding PlaceFlag}" />
+                                            </Button.InputBindings>
+                                            <Grid>
+                                                <Image Source="\Images\flag.png">
+                                                    <Image.Style>
+                                                        <Style TargetType="Image">
+                                                            <Setter Property="Visibility" Value="Hidden"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Square.Value.Status, Converter={StaticResource squareStatusToFlagVisibility}}" Value="Visible">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Value="Visible">
+                                                                    <DataTrigger.Binding>
+                                                                        <MultiBinding Converter="{StaticResource IsMineAfterGameWon}">
+                                                                            <Binding Path="GameStatus.Value"/>
+                                                                            <Binding Path="MineLocations"/>
+                                                                            <Binding Path="Position"/>
+                                                                            <Binding Path="Square.Value.Status"/>
+                                                                        </MultiBinding>
+                                                                    </DataTrigger.Binding>
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Image.Style>
+                                                </Image>
+                                                <Image Source="\Images\mine.png">
+                                                    <Image.Style>
+                                                        <Style TargetType="Image">
+                                                            <Setter Property="Visibility" Value="Hidden"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Square.Value.Status, Converter={StaticResource squareStatusToMineVisibility}}" Value="Visible">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Value="Visible">
+                                                                    <DataTrigger.Binding>
+                                                                        <MultiBinding Converter="{StaticResource IsMineAfterGameLost}">
+                                                                            <Binding Path="GameStatus.Value"/>
+                                                                            <Binding Path="MineLocations"/>
+                                                                            <Binding Path="Position"/>
+                                                                            <Binding Path="Square.Value.Status"/>
+                                                                        </MultiBinding>
+                                                                    </DataTrigger.Binding>
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Image.Style>
+                                                </Image>
+                                                <TextBlock Text="{Binding Square.Value.NeighboringMineCount}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Square.Value.Status, Converter={StaticResource squareStatusToNumberVisibility}}" Value="Hidden">
+                                                                    <Setter Property="Visibility" Value="Hidden"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Square.Value.NeighboringMineCount, Converter={StaticResource squareMineCountToNumberVisibility}}" Value="Hidden">
+                                                                    <Setter Property="Visibility" Value="Hidden"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Viewbox>
+        <Button Width="128" Height="64" Content="Home" Command="{Binding SwitchToSettingsScreen}" VerticalAlignment="Bottom" Margin="75,0,0,12" HorizontalAlignment="Left" FontSize="18" FontWeight="Bold"/>
+        <Button Width="128" Height="64" Content="New Game" Command="{Binding SwitchToGameScreen}" VerticalAlignment="Bottom" Margin="0,0,75,12" HorizontalAlignment="Right" FontSize="18" FontWeight="Bold"/>
+    </Grid>
+</UserControl>

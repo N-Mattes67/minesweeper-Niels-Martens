@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="View.Screens.SettingsScreen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModel="clr-namespace:ViewModel.ScreenViewModels;assembly=ViewModel"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"    
+             d:DesignHeight="700" d:DesignWidth="500">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="colorEnum" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="viewModel:Color" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>    
+    </UserControl.Resources>
+    <Grid>
+        <TextBlock x:Name="Title" Text="--- Minesweeper ---" IsEnabled="False" FontSize="48" Margin="0,20,0,0" FontFamily="Yu Gothic UI" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        
+        <TextBlock FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,100,0,0" FontSize="16">Board Size</TextBlock>
+        <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,125,0,0">Adjust the size of the board you will be playing on.</TextBlock>
+        <DockPanel Width="400"  Height="17" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,150,0,0">
+            <TextBox Text="{Binding ElementName=BoardSize, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Center" Width="40" />
+            <Slider Minimum="{Binding MinBoardSize}" Maximum="{Binding MaxBoardSize}" TickPlacement="BottomRight" TickFrequency="1" IsSnapToTickEnabled="True" Name="BoardSize" Value="{Binding BoardSize}"/>
+        </DockPanel>
+        
+        <TextBlock FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,190,0,0" FontSize="16">Mine probability</TextBlock>
+        <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,215,0,0">Adjust the probability that a square will hava a mine.</TextBlock>
+        <DockPanel Width="400"  Height="17" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,240,0,0">
+            <TextBox Text="{Binding ElementName=MineProbability, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Center" Width="40" />
+            <Slider Minimum="0.1" Maximum="0.9" TickPlacement="BottomRight" Ticks="0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9" IsSnapToTickEnabled="True" Name="MineProbability" Value="{Binding MineProbability}"/>
+        </DockPanel>
+        
+        <TextBlock FontWeight="Bold" Margin="50,280,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16">Flooding</TextBlock>
+        <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="50,305,50,0">Toggle flooding. Flooding automatically reveals empty spaces that don't touch any bombs when you click a nearby space.</TextBlock>
+        <CheckBox IsChecked="{Binding Flooding}" Margin="50,345,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">Flooding</CheckBox>
+
+        <TextBlock FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,385,0,0" FontSize="16">Color theme</TextBlock>
+        <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,410,0,0">Adjust the color of the covered squares.</TextBlock>
+        <ComboBox HorizontalAlignment="Left" Margin="50,230,0,0" Height="25" SelectedItem="{Binding ChosenColor}" ItemsSource="{Binding Source={StaticResource colorEnum}}"/>
+
+        <Button Width="128" Height="64" Content="Start Game" Command="{Binding SwitchToGameScreen}" VerticalAlignment="Bottom" Margin="0,0,0,60" FontSize="18" FontWeight="Bold"/>
+        <Image Source="\Images\flag.png" Width="125" Height="125" HorizontalAlignment="Right" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5" Margin="0,0,30,30" Opacity="0.5"/>
+        <Image Source="\Images\flag.png" Width="125" Height="125" HorizontalAlignment="Left" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5" Margin="30,0,0,30" Opacity="0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+    </Grid>
+</UserControl>

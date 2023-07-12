@@ -1,0 +1,14 @@
+{
+  "first-name": "Niels",
+  "last-name": "Martens",
+  "github-url": "https://github.com/ucll-vgo2122/minesweeper-Niels-Martens",
+  "framework": "WPF",
+  "extensions": [
+    "Color theme can be chosen in settings screen. This will change the color of revealed squares.",
+    "In play screen, when mouse hovers over square, its border lights up in the color theme chosen in settings screen.",
+    "Timer is shown on play screen.",
+    "Number of bombs that are on the board is shown on play screen. Placing a flag lowers the number and removing the flag brings it back up.",
+    "Custom mine probability can be selected in settings screen.",
+    "After losing, all mines are shown and the last uncovered square is highlighted red (which contained a mine)"
+  ]
+}
